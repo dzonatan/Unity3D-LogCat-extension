@@ -21,10 +21,10 @@ Screenshots
 ---------------------
 
 ### Initial window
-![Initial window](/screenshots/FilterByErrorTypesAndString.png “Initial “window)
+![Initial window](/screenshots/InitialWindow.png “Initial “window)
 
 ### Filter by string
-![Filter by string](/screenshots/FilterByErrorTypesAndString.png “Filter example“)
+![Filter by string](/screenshots/FilterByString.png “Filter example“)
 
 ### Filter by log type & string
 ![Filter by log type & string](/screenshots/FilterByErrorTypesAndString.png “Filter example”)
