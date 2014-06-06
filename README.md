@@ -21,13 +21,13 @@ Screenshots
 ---------------------
 
 ### Initial window
-![Initial window](/screenshots/InitialWindow.png “Initial window“)
+![Initial window](/screenshots/InitialWindow.png)
 
 ### Filter by string
-![Filter by string](/screenshots/FilterByString.png “Filter example“)
+![Filter by string](/screenshots/FilterByString.png)
 
 ### Filter by log type & string
-![Filter by log type & string](/screenshots/FilterByErrorTypesAndString.png “Filter example”)
+![Filter by log type & string](/screenshots/FilterByErrorTypesAndString.png)
 
 Contribution
 ---------------------
