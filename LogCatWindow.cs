@@ -26,15 +26,15 @@ public class LogCatWindow : EditorWindow
 
     // Filtered GUI list scroll position
     private Vector2 scrollPosition = new Vector2(0, 0);
-	
-	// Add menu item named "LogCat" to the Window menu
-	[MenuItem("Window/LogCat - Android Logger")]
-	public static void ShowWindow()
+    
+    // Add menu item named "LogCat" to the Window menu
+    [MenuItem("Window/LogCat - Android Logger")]
+    public static void ShowWindow()
     {
-		//Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow(typeof(LogCatWindow), false, "Logcat");
-	}
-   	
+        //Show existing window instance. If one doesn't exist, make one.
+        EditorWindow.GetWindow(typeof(LogCatWindow), false, "Logcat");
+    }
+    
     void Update()
     {
         if (logsList.Count == 0)
@@ -51,8 +51,8 @@ public class LogCatWindow : EditorWindow
         }
     }
 
-	void OnGUI()
-	{
+    void OnGUI()
+    {
         GUILayout.BeginHorizontal();
 
         // Enable button if proccess isn't started
@@ -64,17 +64,19 @@ public class LogCatWindow : EditorWindow
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
-            startInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot")+"/platform-tools/adb";
+            startInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             
-            startInfo.Arguments =@"logcat";
+            startInfo.Arguments = @"logcat";
             proccess = Process.Start(startInfo);  
             
             proccess.ErrorDataReceived += (sender, errorLine) => { 
-                if (errorLine.Data != null && errorLine.Data.Length > 2) addToLogList(new LogCatLog(errorLine.Data)); 
+                if (errorLine.Data != null && errorLine.Data.Length > 2)
+                    addToLogList(new LogCatLog(errorLine.Data)); 
             };
             proccess.OutputDataReceived += (sender, outputLine) => { 
-                if (outputLine.Data != null && outputLine.Data.Length > 2) addToLogList(new LogCatLog(outputLine.Data)); 
+                if (outputLine.Data != null && outputLine.Data.Length > 2)
+                    addToLogList(new LogCatLog(outputLine.Data)); 
             };
             proccess.BeginErrorReadLine();
             proccess.BeginOutputReadLine();
@@ -98,7 +100,7 @@ public class LogCatWindow : EditorWindow
             }
         }
 
-        GUILayout.Label("total "+filteredList.Count+" logs", GUILayout.Height(20));
+        GUILayout.Label("total " + filteredList.Count + " logs", GUILayout.Height(20));
         
         // Create filters
         filterOnlyErrors = GUILayout.Toggle(filterOnlyErrors, "Errors", "Button", GUILayout.Width(80));
@@ -116,24 +118,26 @@ public class LogCatWindow : EditorWindow
         
         // Show only top `showingLimit` log entries
         int fromIndex = filteredList.Count - showLimit;
-        if (fromIndex < 0) fromIndex = 0;
+        if (fromIndex < 0)
+            fromIndex = 0;
+
         for (int i = fromIndex; i < filteredList.Count; i++)
         {
-            LogCatLog log = filteredList[i];
+            LogCatLog log = filteredList [i];
             GUI.backgroundColor = log.getBgColor();
             GUILayout.BeginHorizontal(lineStyle);
-            GUILayout.Label(log.CreationDate+" | "+log.Message);
+            GUILayout.Label(log.CreationDate + " | " + log.Message);
             GUILayout.EndHorizontal(); 
         }
 
         GUILayout.EndScrollView();
-	}
+    }
 
     private class LogCatLog
     {
         public LogCatLog(string data)
         {
-            Type = data[0];
+            Type = data [0];
             Message = data.Substring(2);
             CreationDate = DateTime.Now.ToString("H:mm:ss");
         }
@@ -177,10 +181,10 @@ public class LogCatWindow : EditorWindow
 
     private Texture2D MakeTex(int width, int height, Color col)
     {
-        Color[] pix = new Color[width*height];
+        Color[] pix = new Color[width * height];
         
-        for(int i = 0; i < pix.Length; i++)
-            pix[i] = col;
+        for (int i = 0; i < pix.Length; i++)
+            pix [i] = col;
         
         Texture2D result = new Texture2D(width, height);
         result.SetPixels(pix);
