@@ -10,11 +10,7 @@ public class LogCatWindow : EditorWindow
 {
     private const int memoryLimit = 2000;
     private const int showingLimit = 200;
-
-    private GUIStyle warningStyle;
-    private GUIStyle errorStyle;
-    private GUIStyle debugStyle;
-
+   
     private bool filterOnlyErrors;
     private bool filterOnlyWarnings;
     private bool filterOnlyDebugs;
@@ -33,19 +29,7 @@ public class LogCatWindow : EditorWindow
 		//Show existing window instance. If one doesn't exist, make one.
 		EditorWindow.GetWindow(typeof(LogCatWindow), false, "Logcat");
 	}
-	
-    void Start()
-    {
-        warningStyle = new GUIStyle();
-        errorStyle = new GUIStyle();
-        debugStyle = new GUIStyle();
-        
-        warningStyle.normal.textColor = Color.black;
-        errorStyle.normal.textColor = Color.white;
-        debugStyle.normal.textColor = Color.red;
-        debugStyle.normal.background = MakeTex(600, 1, Color.black);
-    }
-
+   	
     void Update()
     {
         if (logsList.Count == 0)
