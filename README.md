@@ -17,6 +17,10 @@ How to use
 3. Click Window -> LogCat - Android Logger
 4. Start logging by clicking "Start logging"!
 
+Screenshots
+---------------------
+![alt text](/screenshots/FilterByErrorTypesAndString.png "Title")
+
 Contribution
 ---------------------
 Feel free to contribute!
