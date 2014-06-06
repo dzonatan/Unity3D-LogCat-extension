@@ -19,7 +19,15 @@ How to use
 
 Screenshots
 ---------------------
-![alt text](/screenshots/FilterByErrorTypesAndString.png "Title")
+
+### Initial window
+![Initial window](/screenshots/FilterByErrorTypesAndString.png “Initial “window)
+
+### Filter by string
+![Filter by string](/screenshots/FilterByErrorTypesAndString.png “Filter example“)
+
+### Filter by log type & string
+![Filter by log type & string](/screenshots/FilterByErrorTypesAndString.png “Filter example”)
 
 Contribution
 ---------------------
