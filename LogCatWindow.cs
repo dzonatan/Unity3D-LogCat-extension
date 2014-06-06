@@ -8,7 +8,10 @@ using System;
 
 public class LogCatWindow : EditorWindow
 {
+    // How many log entries to store in memory. Keep it low for better performance.
     private const int memoryLimit = 2000;
+
+    // How many log entries to show in unity3D editor. Keep it low for better performance.
     private const int showLimit = 200;
    
     // Filters
@@ -55,7 +58,7 @@ public class LogCatWindow : EditorWindow
     {
         GUILayout.BeginHorizontal();
 
-        // Enable button if proccess isn't started
+        // Enable button if proccess is not started
         GUI.enabled = proccess == null;
         if (GUILayout.Button("Start logging", GUILayout.Height(20), GUILayout.Width(100)))
         {
@@ -66,8 +69,8 @@ public class LogCatWindow : EditorWindow
             startInfo.RedirectStandardError = true;
             startInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            
             startInfo.Arguments = @"logcat";
+
             proccess = Process.Start(startInfo);  
             
             proccess.ErrorDataReceived += (sender, errorLine) => { 
@@ -82,7 +85,7 @@ public class LogCatWindow : EditorWindow
             proccess.BeginOutputReadLine();
         }
         
-        // Disable button if proccess is started
+        // Disable button if proccess is already started
         GUI.enabled = proccess != null;
         if (GUILayout.Button("Stop logging", GUILayout.Height(20), GUILayout.Width(100)))
         {
