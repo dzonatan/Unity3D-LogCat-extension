@@ -21,7 +21,7 @@ Screenshots
 ---------------------
 
 ### Initial window
-![Initial window](/screenshots/InitialWindow.png “Initial “window)
+![Initial window](/screenshots/InitialWindow.png “Initial window“)
 
 ### Filter by string
 ![Filter by string](/screenshots/FilterByString.png “Filter example“)
