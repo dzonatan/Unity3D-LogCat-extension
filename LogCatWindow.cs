@@ -9,18 +9,23 @@ using System;
 public class LogCatWindow : EditorWindow
 {
     private const int memoryLimit = 2000;
-    private const int showingLimit = 200;
+    private const int showLimit = 200;
    
+    // Filters
     private bool filterOnlyErrors;
     private bool filterOnlyWarnings;
     private bool filterOnlyDebugs;
-
-    private Process proccess;
-    private Vector2 scrollPosition = new Vector2(0, 0);
     private string searchString = "";
 
+    // Android adb logcat proccess
+    private Process proccess;
+
+    // Log entries
     private List<LogCatLog> logsList = new List<LogCatLog>();
     private List<LogCatLog> filteredList = new List<LogCatLog>(memoryLimit);
+
+    // Filtered GUI list scroll position
+    private Vector2 scrollPosition = new Vector2(0, 0);
 	
 	// Add menu item named "LogCat" to the Window menu
 	[MenuItem("Window/LogCat - Android Logger")]
@@ -35,13 +40,10 @@ public class LogCatWindow : EditorWindow
         if (logsList.Count == 0)
             return;
 
-        lock (filteredList)
+        lock (logsList)
         {
-            // Duplicate the list
-            filteredList = new List<LogCatLog>(logsList);
-      
             // Filter
-            filteredList = filteredList.Where(log => (searchString.Length <= 2 || log.Message.ToLower().Contains(searchString.ToLower())) &&
+            filteredList = logsList.Where(log => (searchString.Length <= 2 || log.Message.ToLower().Contains(searchString.ToLower())) &&
                 ((!filterOnlyErrors && !filterOnlyWarnings && !filterOnlyDebugs) 
                 || filterOnlyErrors && log.Type == 'E' 
                 || filterOnlyWarnings && log.Type == 'W' 
@@ -89,8 +91,11 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = true;
         if (GUILayout.Button("Clear", GUILayout.Height(20), GUILayout.Width(100)))
         {
-            logsList.Clear();
-            filteredList.Clear();
+            lock (logsList)
+            {
+                logsList.Clear();
+                filteredList.Clear();
+            }
         }
 
         GUILayout.Label("total "+filteredList.Count+" logs", GUILayout.Height(20));
@@ -110,7 +115,7 @@ public class LogCatWindow : EditorWindow
         scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(Screen.height - 45));
         
         // Show only top `showingLimit` log entries
-        int fromIndex = filteredList.Count - showingLimit;
+        int fromIndex = filteredList.Count - showLimit;
         if (fromIndex < 0) fromIndex = 0;
         for (int i = fromIndex; i < filteredList.Count; i++)
         {
@@ -186,9 +191,12 @@ public class LogCatWindow : EditorWindow
 
     private void addToLogList(LogCatLog log)
     {
-        if (logsList.Count > memoryLimit + 1)
-            logsList.RemoveRange(0, logsList.Count - memoryLimit + 1);
+        lock (logsList)
+        {
+            if (logsList.Count > memoryLimit + 1)
+                logsList.RemoveRange(0, logsList.Count - memoryLimit + 1);
 
-        logsList.Add(log);
+            logsList.Add(log);
+        }
     }
 }
