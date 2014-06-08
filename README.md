@@ -1,7 +1,10 @@
 Unity3D LogCat extension
 ========================
 
-Logcat (android logging) extension for unity3D
+Logcat (android logging) extension for unity3D. Forget about using android studio or worthless terminal window. 
+Log and filter your android messages directly from Unity3D!
+
+Works both on windows & mac OS!
 
 Functions
 ---------------------
