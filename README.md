@@ -27,10 +27,10 @@ Screenshots
 ### Initial window
 ![Initial window](/screenshots/InitialWindow.png)
 
-### Filter by error type(s)
+### Filter by log type(s)
 ![Filter by string](/screenshots/FilterByErrorTypes.png)
 
-### Filter by log type & string
+### Filter by log type(s) & text
 ![Filter by log type & string](/screenshots/FilterByErrorTypesAndString.png)
 
 Contribution
