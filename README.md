@@ -10,8 +10,9 @@ Functions
 ---------------------
 - Start / stop logging
 - Clear logs
-- Filter by log type (error, warning, debug)
-- Filter by string (by contains)
+- "Only Unity" pre-filter.
+- Filter by log type (error, warning, debug, info, verbose)
+- Filter by text (case-insensitive)
 
 How to use
 ---------------------
@@ -26,8 +27,8 @@ Screenshots
 ### Initial window
 ![Initial window](/screenshots/InitialWindow.png)
 
-### Filter by string
-![Filter by string](/screenshots/FilterByString.png)
+### Filter by error type(s)
+![Filter by string](/screenshots/FilterByErrorTypes.png)
 
 ### Filter by log type & string
 ![Filter by log type & string](/screenshots/FilterByErrorTypesAndString.png)
