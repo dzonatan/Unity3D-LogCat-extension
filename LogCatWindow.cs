@@ -15,10 +15,10 @@ public class LogCatWindow : EditorWindow
     private const int showLimit = 200;
    
     // Filters
-    private bool filterOnlyErrors;
-    private bool filterOnlyWarnings;
-    private bool filterOnlyDebugs;
-    private string filterByString = "";
+    private bool filterOnlyErrors = false;
+    private bool filterOnlyWarnings = false;
+    private bool filterOnlyDebugs = false;
+    private string filterByString = String.Empty;
 
     // Android adb logcat proccess
     private Process proccess;
@@ -79,7 +79,7 @@ public class LogCatWindow : EditorWindow
             };
             proccess.OutputDataReceived += (sender, outputLine) => { 
                 if (outputLine.Data != null && outputLine.Data.Length > 2)
-                    (new LogCatLog(outputLine.Data)); 
+                    AddLog(new LogCatLog(outputLine.Data)); 
             };
             proccess.BeginErrorReadLine();
             proccess.BeginOutputReadLine();
