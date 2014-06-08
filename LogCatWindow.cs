@@ -110,8 +110,19 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess != null;
         if (GUILayout.Button("Stop", GUILayout.Width(60)))
         {
-            logCatProcess.Kill();
-            logCatProcess = null;
+            try 
+            {
+                logCatProcess.Kill();
+            }
+            catch(InvalidOperationException ex)
+            {
+                // Just ignore it.
+            }
+            finally
+            {
+                logCatProcess = null;
+
+            }
         }
         
         GUI.enabled = true;

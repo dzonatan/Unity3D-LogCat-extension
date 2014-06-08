@@ -10,7 +10,7 @@ Functions
 ---------------------
 - Start / stop logging
 - Clear logs
-- "Only Unity" pre-filter.
+- "Only Unity" pre-filter
 - Filter by log type (error, warning, debug, info, verbose)
 - Filter by text (case-insensitive)
 
