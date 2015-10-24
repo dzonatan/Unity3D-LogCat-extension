@@ -16,7 +16,7 @@ Functions
 
 How to use
 ---------------------
-1. Clone `LogCatWindow.cs` from this repository to your assets folder
+1. Clone `LogCatWindow.cs` from this repository into a folder named `Editor` within your `Assets` folder
 2. Plug in the android device to the usb
 3. Click Window -> LogCat - Android Logger
 4. Start logging by clicking "Start logging" button!
