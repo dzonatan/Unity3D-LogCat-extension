@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.IO;
 
 public class LogCatWindow : EditorWindow
 {
@@ -71,12 +72,14 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess == null;
         if (GUILayout.Button("Start", GUILayout.Width(60)))
         {
+            string adbPath = Path.Combine(GetAndroidSdkRoot(), Path.Combine("platform-tools", "adb"));
+
             // Start `adb logcat -c` to clear the log buffer
             ProcessStartInfo clearProcessInfo = new ProcessStartInfo();
             clearProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             clearProcessInfo.CreateNoWindow = true;
             clearProcessInfo.UseShellExecute = false;
-            clearProcessInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
+            clearProcessInfo.FileName = adbPath;
             clearProcessInfo.Arguments = @"logcat -c";
             Process.Start(clearProcessInfo);  
             
@@ -86,7 +89,7 @@ public class LogCatWindow : EditorWindow
             logProcessInfo.UseShellExecute = false;
             logProcessInfo.RedirectStandardOutput = true;
             logProcessInfo.RedirectStandardError = true;
-            logProcessInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
+            logProcessInfo.FileName = adbPath;
             logProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             
             // Add additional -s argument for filtering by Unity tag.
@@ -254,5 +257,32 @@ public class LogCatWindow : EditorWindow
                     return Color.grey;
             }
         }
+    }
+
+    private static string GetAndroidSdkRoot()
+    {
+        string androidPlatformTools = "";
+#if UNITY_2019_1_OR_NEWER
+        bool sdkUseEmbedded = EditorPrefs.GetBool("SdkUseEmbedded", false);
+        if (!sdkUseEmbedded)
+        {
+            androidPlatformTools = EditorPrefs.GetString("AndroidSdkRoot");
+            if (!Directory.Exists(androidPlatformTools))
+            {
+                sdkUseEmbedded = true;
+            }
+        }
+
+        if (sdkUseEmbedded)
+        {
+            string androidPlaybackEngineDirectory =
+                BuildPipeline.GetPlaybackEngineDirectory(BuildTarget.Android, BuildOptions.None);
+            androidPlatformTools = Path.Combine(androidPlaybackEngineDirectory, "SDK");
+        }
+#else
+        androidPlatformTools = EditorPrefs.GetString("AndroidSdkRoot");
+#endif
+
+        return androidPlatformTools;
     }
 }
