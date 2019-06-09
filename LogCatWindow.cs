@@ -5,6 +5,9 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+#if UNITY_2017_3_OR_NEWER
+using UnityEditor.Compilation;
+#endif
 
 public class LogCatWindow : EditorWindow
 {
@@ -198,7 +201,35 @@ public class LogCatWindow : EditorWindow
             logsList.Add(log);
         }
     }
-    
+
+    void OnEnable()
+    {
+#if UNITY_2017_3_OR_NEWER
+        CompilationPipeline.assemblyCompilationStarted += OnAssemblyCompilationStarted;
+#endif
+    }
+
+    void OnDisable()
+    {
+#if UNITY_2017_3_OR_NEWER
+        CompilationPipeline.assemblyCompilationStarted -= OnAssemblyCompilationStarted;
+#endif
+    }
+
+    private void OnAssemblyCompilationStarted(string _)
+    {
+        if (logCatProcess == null)
+        {
+            return;
+        }
+        if (!logCatProcess.HasExited)
+        {
+            logCatProcess.Kill();
+        }
+        logCatProcess.Dispose();
+        logCatProcess = null;
+    }
+
     private class LogCatLog
     {
         public LogCatLog(string data)
