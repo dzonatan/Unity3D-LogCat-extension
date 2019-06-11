@@ -113,19 +113,7 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess != null;
         if (GUILayout.Button("Stop", GUILayout.Width(60)))
         {
-            try 
-            {
-                logCatProcess.Kill();
-            }
-            catch(InvalidOperationException ex)
-            {
-                // Just ignore it.
-            }
-            finally
-            {
-                logCatProcess = null;
-
-            }
+            StopLogCatProcess();
         }
         
         GUI.enabled = true;
@@ -216,18 +204,38 @@ public class LogCatWindow : EditorWindow
 #endif
     }
 
-    private void OnAssemblyCompilationStarted(string _)
+    void OnDestroy()
+    {
+        StopLogCatProcess();
+    }
+
+    private void StopLogCatProcess()
     {
         if (logCatProcess == null)
         {
             return;
         }
-        if (!logCatProcess.HasExited)
+        try
         {
-            logCatProcess.Kill();
+            if (!logCatProcess.HasExited)
+            {
+                logCatProcess.Kill();
+            }
         }
-        logCatProcess.Dispose();
-        logCatProcess = null;
+        catch(InvalidOperationException)
+        {
+            // Just ignore it.
+        }
+        finally
+        {
+            logCatProcess.Dispose();
+            logCatProcess = null;
+        }
+    }
+
+    private void OnAssemblyCompilationStarted(string _)
+    {
+        StopLogCatProcess();
     }
 
     private class LogCatLog
