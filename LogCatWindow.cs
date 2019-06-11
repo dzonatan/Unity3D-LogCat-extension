@@ -57,6 +57,8 @@ public class LogCatWindow : EditorWindow
              || filterOnlyInfo && log.Type == 'I' 
              || filterOnlyVerbose && log.Type == 'V')).ToList();
         }
+        
+        Repaint();
     }
     
     void OnGUI()
@@ -90,7 +92,7 @@ public class LogCatWindow : EditorWindow
             logProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             
             // Add additional -s argument for filtering by Unity tag.
-            logProcessInfo.Arguments = "logcat"+(prefilterOnlyUnity ? " -s  \"Unity\"": "");
+            logProcessInfo.Arguments = "logcat -v brief"+(prefilterOnlyUnity ? " -s  \"Unity\"": "");
             
             logCatProcess = Process.Start(logProcessInfo);  
             
