@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿#if PLATFORM_ANDROID
+using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using UnityEditor.Android;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +74,7 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess == null;
         if (GUILayout.Button("Start", GUILayout.Width(60)))
         {
-            string adbPath = Path.Combine(GetAndroidSdkRoot(), Path.Combine("platform-tools", "adb"));
+            string adbPath = GetAdbPath();
 
             // Start `adb logcat -c` to clear the log buffer
             ProcessStartInfo clearProcessInfo = new ProcessStartInfo();
@@ -259,30 +261,19 @@ public class LogCatWindow : EditorWindow
         }
     }
 
-    private static string GetAndroidSdkRoot()
+    private static string GetAdbPath()
     {
-        string androidPlatformTools = "";
 #if UNITY_2019_1_OR_NEWER
-        bool sdkUseEmbedded = EditorPrefs.GetBool("SdkUseEmbedded", false);
-        if (!sdkUseEmbedded)
-        {
-            androidPlatformTools = EditorPrefs.GetString("AndroidSdkRoot");
-            if (!Directory.Exists(androidPlatformTools))
-            {
-                sdkUseEmbedded = true;
-            }
-        }
-
-        if (sdkUseEmbedded)
-        {
-            string androidPlaybackEngineDirectory =
-                BuildPipeline.GetPlaybackEngineDirectory(BuildTarget.Android, BuildOptions.None);
-            androidPlatformTools = Path.Combine(androidPlaybackEngineDirectory, "SDK");
-        }
+        ADB adb = ADB.GetInstance();
+        return adb == null ? string.Empty : adb.GetADBPath();
 #else
-        androidPlatformTools = EditorPrefs.GetString("AndroidSdkRoot");
+        string androidSdkRoot = EditorPrefs.GetString("AndroidSdkRoot");
+        if (string.IsNullOrEmpty(androidSdkRoot))
+        {
+            return string.Empty;
+        }
+        return Path.Combine(androidSdkRoot, Path.Combine("platform-tools", "adb"));
 #endif
-
-        return androidPlatformTools;
     }
 }
+#endif
