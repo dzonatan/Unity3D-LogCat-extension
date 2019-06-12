@@ -31,6 +31,7 @@ public class LogCatWindow : EditorWindow
     private List<LogCatLog> logsList = new List<LogCatLog>();
     private List<LogCatLog> filteredList = new List<LogCatLog>(memoryLimit);
     private const string LogcatPattern = @"([0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]\.[0-9]{3}) ([WIEDV])/(.*)";
+    private static readonly Regex LogcatRegex = new Regex(LogcatPattern, RegexOptions.Compiled);
     
     // Filtered GUI list scroll position
     private Vector2 scrollPosition = new Vector2(0, 0);
@@ -213,7 +214,7 @@ public class LogCatWindow : EditorWindow
             // D - debug
             // I - info
             // V - verbose
-            Match match = Regex.Match(data, LogcatPattern);
+            Match match = LogcatRegex.Match(data);
             if (match.Success)
             {
                 Type = match.Groups[2].Value[0];
