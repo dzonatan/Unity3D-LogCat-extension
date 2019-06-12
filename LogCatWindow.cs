@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.IO;
+#if UNITY_2017_3_OR_NEWER
+using UnityEditor.Compilation;
+#endif
 
 public class LogCatWindow : EditorWindow
 {
@@ -115,19 +118,7 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess != null;
         if (GUILayout.Button("Stop", GUILayout.Width(60)))
         {
-            try 
-            {
-                logCatProcess.Kill();
-            }
-            catch(InvalidOperationException ex)
-            {
-                // Just ignore it.
-            }
-            finally
-            {
-                logCatProcess = null;
-
-            }
+            StopLogCatProcess();
         }
         
         GUI.enabled = true;
@@ -203,7 +194,55 @@ public class LogCatWindow : EditorWindow
             logsList.Add(log);
         }
     }
-    
+
+    void OnEnable()
+    {
+#if UNITY_2017_3_OR_NEWER
+        CompilationPipeline.assemblyCompilationStarted += OnAssemblyCompilationStarted;
+#endif
+    }
+
+    void OnDisable()
+    {
+#if UNITY_2017_3_OR_NEWER
+        CompilationPipeline.assemblyCompilationStarted -= OnAssemblyCompilationStarted;
+#endif
+    }
+
+    void OnDestroy()
+    {
+        StopLogCatProcess();
+    }
+
+    private void StopLogCatProcess()
+    {
+        if (logCatProcess == null)
+        {
+            return;
+        }
+        try
+        {
+            if (!logCatProcess.HasExited)
+            {
+                logCatProcess.Kill();
+            }
+        }
+        catch(InvalidOperationException)
+        {
+            // Just ignore it.
+        }
+        finally
+        {
+            logCatProcess.Dispose();
+            logCatProcess = null;
+        }
+    }
+
+    private void OnAssemblyCompilationStarted(string _)
+    {
+        StopLogCatProcess();
+    }
+
     private class LogCatLog
     {
         public LogCatLog(string data)
