@@ -1,11 +1,17 @@
-﻿using UnityEngine;
+﻿#if PLATFORM_ANDROID
+using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using UnityEditor.Android;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Text.RegularExpressions;
+using System.IO;
+#if UNITY_2017_3_OR_NEWER
+using UnityEditor.Compilation;
+#endif
 
 public class LogCatWindow : EditorWindow
 {
@@ -32,7 +38,7 @@ public class LogCatWindow : EditorWindow
     private List<LogCatLog> filteredList = new List<LogCatLog>(memoryLimit);
     private const string LogcatPattern = @"([0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]\.[0-9]{3}) ([WIEDV])/(.*)";
     private static readonly Regex LogcatRegex = new Regex(LogcatPattern, RegexOptions.Compiled);
-    
+
     // Filtered GUI list scroll position
     private Vector2 scrollPosition = new Vector2(0, 0);
     
@@ -60,7 +66,7 @@ public class LogCatWindow : EditorWindow
              || filterOnlyInfo && log.Type == 'I' 
              || filterOnlyVerbose && log.Type == 'V')).ToList();
         }
-        
+
         Repaint();
     }
     
@@ -76,12 +82,14 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess == null;
         if (GUILayout.Button("Start", GUILayout.Width(60)))
         {
+            string adbPath = GetAdbPath();
+
             // Start `adb logcat -c` to clear the log buffer
             ProcessStartInfo clearProcessInfo = new ProcessStartInfo();
             clearProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             clearProcessInfo.CreateNoWindow = true;
             clearProcessInfo.UseShellExecute = false;
-            clearProcessInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
+            clearProcessInfo.FileName = adbPath;
             clearProcessInfo.Arguments = @"logcat -c";
             Process.Start(clearProcessInfo);  
             
@@ -91,7 +99,7 @@ public class LogCatWindow : EditorWindow
             logProcessInfo.UseShellExecute = false;
             logProcessInfo.RedirectStandardOutput = true;
             logProcessInfo.RedirectStandardError = true;
-            logProcessInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
+            logProcessInfo.FileName = adbPath;
             logProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             
             // Add additional -s argument for filtering by Unity tag.
@@ -115,19 +123,7 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess != null;
         if (GUILayout.Button("Stop", GUILayout.Width(60)))
         {
-            try 
-            {
-                logCatProcess.Kill();
-            }
-            catch(InvalidOperationException ex)
-            {
-                // Just ignore it.
-            }
-            finally
-            {
-                logCatProcess = null;
-
-            }
+            StopLogCatProcess();
         }
         
         GUI.enabled = true;
@@ -203,7 +199,55 @@ public class LogCatWindow : EditorWindow
             logsList.Add(log);
         }
     }
-    
+
+    void OnEnable()
+    {
+#if UNITY_2017_3_OR_NEWER
+        CompilationPipeline.assemblyCompilationStarted += OnAssemblyCompilationStarted;
+#endif
+    }
+
+    void OnDisable()
+    {
+#if UNITY_2017_3_OR_NEWER
+        CompilationPipeline.assemblyCompilationStarted -= OnAssemblyCompilationStarted;
+#endif
+    }
+
+    void OnDestroy()
+    {
+        StopLogCatProcess();
+    }
+
+    private void StopLogCatProcess()
+    {
+        if (logCatProcess == null)
+        {
+            return;
+        }
+        try
+        {
+            if (!logCatProcess.HasExited)
+            {
+                logCatProcess.Kill();
+            }
+        }
+        catch(InvalidOperationException)
+        {
+            // Just ignore it.
+        }
+        finally
+        {
+            logCatProcess.Dispose();
+            logCatProcess = null;
+        }
+    }
+
+    private void OnAssemblyCompilationStarted(string _)
+    {
+        StopLogCatProcess();
+    }
+
     private class LogCatLog
     {
         public LogCatLog(string data)
@@ -271,4 +315,20 @@ public class LogCatWindow : EditorWindow
             }
         }
     }
+
+    private static string GetAdbPath()
+    {
+#if UNITY_2019_1_OR_NEWER
+        ADB adb = ADB.GetInstance();
+        return adb == null ? string.Empty : adb.GetADBPath();
+#else
+        string androidSdkRoot = EditorPrefs.GetString("AndroidSdkRoot");
+        if (string.IsNullOrEmpty(androidSdkRoot))
+        {
+            return string.Empty;
+        }
+        return Path.Combine(androidSdkRoot, Path.Combine("platform-tools", "adb"));
+#endif
+    }
 }
+#endif
