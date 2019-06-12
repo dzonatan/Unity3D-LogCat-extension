@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Text.RegularExpressions;
 
 public class LogCatWindow : EditorWindow
 {
@@ -29,6 +30,7 @@ public class LogCatWindow : EditorWindow
     // Log entries
     private List<LogCatLog> logsList = new List<LogCatLog>();
     private List<LogCatLog> filteredList = new List<LogCatLog>(memoryLimit);
+    private const string LogcatPattern = @"([0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]\.[0-9]{3}) ([WIEDV])/(.*)";
     
     // Filtered GUI list scroll position
     private Vector2 scrollPosition = new Vector2(0, 0);
@@ -92,7 +94,7 @@ public class LogCatWindow : EditorWindow
             logProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             
             // Add additional -s argument for filtering by Unity tag.
-            logProcessInfo.Arguments = "logcat -v brief"+(prefilterOnlyUnity ? " -s  \"Unity\"": "");
+            logProcessInfo.Arguments = "logcat -v time"+(prefilterOnlyUnity ? " -s  \"Unity\"": "");
             
             logCatProcess = Process.Start(logProcessInfo);  
             
@@ -211,10 +213,21 @@ public class LogCatWindow : EditorWindow
             // D - debug
             // I - info
             // V - verbose
-            Type = data[0];
-            
-            Message = data.Substring(2);
-            CreationDate = DateTime.Now.ToString("H:mm:ss");
+            Match match = Regex.Match(data, LogcatPattern);
+            if (match.Success)
+            {
+                Type = match.Groups[2].Value[0];
+
+                Message = match.Groups[3].Value;
+                CreationDate = match.Groups[1].Value;
+            }
+            else
+            {
+                Type = 'V';
+
+                Message = data;
+                CreationDate = DateTime.Now.ToString("MM-dd HH:mm:ss.fff");
+            }
         }
         
         public string CreationDate
