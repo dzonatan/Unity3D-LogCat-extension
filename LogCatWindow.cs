@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿#if PLATFORM_ANDROID
+using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using UnityEditor.Android;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.IO;
 
 public class LogCatWindow : EditorWindow
 {
@@ -71,12 +74,14 @@ public class LogCatWindow : EditorWindow
         GUI.enabled = logCatProcess == null;
         if (GUILayout.Button("Start", GUILayout.Width(60)))
         {
+            string adbPath = GetAdbPath();
+
             // Start `adb logcat -c` to clear the log buffer
             ProcessStartInfo clearProcessInfo = new ProcessStartInfo();
             clearProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             clearProcessInfo.CreateNoWindow = true;
             clearProcessInfo.UseShellExecute = false;
-            clearProcessInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
+            clearProcessInfo.FileName = adbPath;
             clearProcessInfo.Arguments = @"logcat -c";
             Process.Start(clearProcessInfo);  
             
@@ -86,7 +91,7 @@ public class LogCatWindow : EditorWindow
             logProcessInfo.UseShellExecute = false;
             logProcessInfo.RedirectStandardOutput = true;
             logProcessInfo.RedirectStandardError = true;
-            logProcessInfo.FileName = EditorPrefs.GetString("AndroidSdkRoot") + "/platform-tools/adb";
+            logProcessInfo.FileName = adbPath;
             logProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             
             // Add additional -s argument for filtering by Unity tag.
@@ -255,4 +260,20 @@ public class LogCatWindow : EditorWindow
             }
         }
     }
+
+    private static string GetAdbPath()
+    {
+#if UNITY_2019_1_OR_NEWER
+        ADB adb = ADB.GetInstance();
+        return adb == null ? string.Empty : adb.GetADBPath();
+#else
+        string androidSdkRoot = EditorPrefs.GetString("AndroidSdkRoot");
+        if (string.IsNullOrEmpty(androidSdkRoot))
+        {
+            return string.Empty;
+        }
+        return Path.Combine(androidSdkRoot, Path.Combine("platform-tools", "adb"));
+#endif
+    }
 }
+#endif
