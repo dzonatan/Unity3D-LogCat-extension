@@ -67,7 +67,10 @@ public class LogCatWindow : EditorWindow
              || filterOnlyVerbose && log.Type == 'V')).ToList();
         }
 
-        Repaint();
+        if (logCatProcess != null)
+        {
+            Repaint();
+        }
     }
     
     void OnGUI()
