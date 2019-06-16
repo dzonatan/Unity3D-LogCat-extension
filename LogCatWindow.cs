@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 #if UNITY_2017_3_OR_NEWER
@@ -102,6 +103,7 @@ public class LogCatWindow : EditorWindow
             logProcessInfo.UseShellExecute = false;
             logProcessInfo.RedirectStandardOutput = true;
             logProcessInfo.RedirectStandardError = true;
+            logProcessInfo.StandardOutputEncoding = Encoding.UTF8;
             logProcessInfo.FileName = adbPath;
             logProcessInfo.WindowStyle = ProcessWindowStyle.Hidden;
             
